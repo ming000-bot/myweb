@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科技感个人主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            color: #e2e8f0;
+            font-family: system-ui, sans-serif;
+        }
+        .main-content {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: #0a1929;
+            background-image: url("images/wallpaper.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .top-banner {
+            height: 16.66vh;
+            width: 100%;
+            background: url("https://picsum.photos/id/1/1920/300") center/cover no-repeat;
+            border-bottom: 2px solid #38bdf8;
+        }
+        .nav-bar {
+            background-color: rgba(30, 41, 59, 0.5);
+            padding: 12px 24px;
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #334155;
+            align-items:center;
+        }
+        .nav-bar a {
+            color: #7dd3fc;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .nav-bar a:hover {
+            color: #0ea5e9;
+        }
+        .nav-ctrl-group{
+            margin-left:auto;
+            display:flex;
+            gap:10px;
+        }
+        .nav-ctrl-group button{
+            padding:6px 12px;
+            border-radius:6px;
+            border:none;
+            cursor:pointer;
+        }
+        .btn-export{
+            background:#0ea5e9;
+            color:#fff;
+        }
+        .btn-import{
+            background:#475569;
+            color:#fff;
+        }
+        #fileInput{
+            display:none;
+        }
+        .container {
+            flex: 1;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            width: 100%;
+            outline: none;
+            border: none;
+            box-shadow: none;
+            background: transparent;
+        }
+        .content-card {
+            display: flex;
+            gap: 20px;
+            background-color: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow:
+                0 0 18px rgba(14, 165, 233, 0.35),
+                inset 0 0 0 1px rgba(56, 189, 248, 0.08);
+            backdrop-filter: blur(6px);
+            outline: none;
+        }
+        .add-card {
+            border: 1px dashed rgba(56, 189, 248, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+            cursor: pointer;
+            outline: none;
+        }
+        .add-card .tip-text{
+            color:#7dd3fc;
+            font-size:18px;
+        }
+        .visit-count {
+            min-width: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: #38bdf8;
+            font-weight: bold;
+        }
+        .card-body {
+            flex: 1;
+        }
+        .card-body h3 {
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+        .upload-time {
+            color: #94a3b8;
+            font-size: 14px;
+            margin: 8px 0;
+        }
+        .card-body p {
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+        .modal-wrap{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.65);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index:999;
+        }
+        .modal-box{
+            width: min(90%,600px);
+            background:#1e293b;
+            border:1px solid #38bdf8;
+            border-radius:12px;
+            padding:24px;
+            box-shadow:0 0 24px rgba(14,165,233,0.3);
+        }
+        .modal-box h3{
+            color:#38bdf8;
+            margin-bottom:16px;
+        }
+        .modal-item{
+            margin-bottom:14px;
+        }
+        .modal-item label{
+            display:block;
+            color:#cbd5e1;
+            margin-bottom:6px;
+        }
+        .modal-item input, .modal-item textarea{
+            width:100%;
+            padding:10px;
+            background:#0f172a;
+            border:1px solid #334155;
+            border-radius:6px;
+            color:#e2e8f0;
+        }
+        .modal-item textarea{
+            min-height:140px;
+            resize:vertical;
+        }
+        .modal-buttons{
+            display:flex;
+            gap:12px;
+            justify-content:flex-end;
+            margin-top:20px;
+        }
+        .modal-buttons button{
+            padding:9px 18px;
+            border-radius:6px;
+            border:none;
+            cursor:pointer;
+        }
+        .btn-submit{
+            background:#0ea5e9;
+            color:#fff;
+        }
+        .btn-close{
+            background:#475569;
+            color:#fff;
+        }
+        .album-section {
+            display: none;
+        }
+        .album-section.active {
+            display: block;
+        }
+        .waterfall {
+            column-count: 3;
+            column-gap: 16px;
+        }
+        @media (max-width:768px){
+            .waterfall {
+                column-count:2;
+            }
+        }
+        @media (max-width:480px){
+            .waterfall {
+                column-count:1;
+            }
+        }
+        .waterfall-item {
+            break-inside: avoid;
+            margin-bottom:16px;
+            position:relative;
+            border-radius:10px;
+            overflow:hidden;
+        }
+        .waterfall-item img {
+            width:100%;
+            display:block;
+        }
+        .img-name {
+            position:absolute;
+            right:10px;
+            bottom:10px;
+            font-size:12px;
+            color:#fff;
+            background:rgba(0,0,0,0.5);
+            padding:3px 6px;
+            border-radius:4px;
+            opacity:0;
+            transition: opacity 0.3s;
+        }
+        .waterfall-item:hover .img-name {
+            opacity:1;
+        }
+        .note-section.active {
+            display:block;
+        }
+        .note-section {
+            display:none;
+        }
+        .home-section.active {
+            display:block;
+        }
+        .home-section {
+            display:none;
+        }
+        .website-section{
+            display:none;
+        }
+        .website-section.active{
+            display:block;
+        }
+        .website-btn-wrap{
+            display:grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap:16px;
+        }
+        .website-btn-wrap a{
+            display:block;
+            text-align:center;
+            padding:18px 10px;
+            background-color:rgba(30, 41, 59, 0.6);
+            border:1px solid rgba(56, 189, 248, 0.25);
+            border-radius:10px;
+            color:#7dd3fc;
+            text-decoration:none;
+            box-shadow:
+                0 0 12px rgba(14,165,233,0.25),
+                inset 0 0 0 1px rgba(56, 189, 248, 0.08);
+            backdrop-filter: blur(6px);
+            transition:0.2s;
+            outline: none;
+        }
+        .website-btn-wrap a:hover{
+            background-color:rgba(14,165,233,0.35);
+            color:#ffffff;
+        }
+        @media (max-width:900px){
+            .website-btn-wrap{
+                grid-template-columns: repeat(3,1fr);
+            }
+        }
+        @media (max-width:520px){
+            .website-btn-wrap{
+                grid-template-columns: repeat(2,1fr);
+            }
+        }
+        .about-section{
+            display:none;
+        }
+        .about-section.active{
+            display:block;
+        }
+        .about-card{
+            background-color: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow:
+                0 0 18px rgba(14, 165, 233, 0.35),
+                inset 0 0 0 1px rgba(56, 189, 248, 0.08);
+            backdrop-filter: blur(6px);
+            outline: none;
+        }
+        .about-card h2{
+            color:#38bdf8;
+            margin-bottom:20px;
+        }
+        .about-item{
+            margin:12px 0;
+            font-size:16px;
+            color:#cbd5e1;
+        }
+        .about-item span{
+            color:#7dd3fc;
+        }
+        /* 底部：完全移除顶边黑线 */
+        footer {
+            padding: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            background-color: transparent;
+        }
+/* 左侧悬浮图片卡片 185*285 */
+.left-float-card{
+    position: fixed;
+    left:12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width:185px;
+    height:285px;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow: 0 0 16px rgba(14,165,233,0.3);
+    z-index:99;
+}
+.left-float-card a{
+    display:block;
+    width:100%;
+    height:100%;
+}
+.left-float-card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+/* 关闭按钮 */
+.float-close{
+    position:absolute;
+    top:4px;
+    right:4px;
+    width:24px;
+    height:24px;
+    background:rgba(0,0,0,0.45);
+    color:#fff;
+    border-radius:50%;
+    text-align:center;
+    line-height:24px;
+    font-size:16px;
+    cursor:pointer;
+    user-select:none;
+}
+.float-close:hover{
+    background:rgba(255,80,80,0.7);
+}
+/*便利贴容器*/
+.sticky-wrap{
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    gap:18px;
+    margin:20px 0;
+}
+/*便利贴卡片 文字清晰，调高透明度，深色文字*/
+.sticky-note{
+    padding:20px;
+    border-radius:6px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.25);
+    opacity:0.92;
+    min-height:160px;
+    color:#111;
+    font-size:16px;
+    font-weight:500;
+    cursor:text;
+}
+.sticky-note:focus{
+    outline: 2px solid #0ea5e9;
+}
+/*不同颜色便利贴*/
+.note-yellow{background:#fff79a;}
+.note-green{background:#b7f0b7;}
+.note-blue{background:#b7dfff;}
+.note-pink{background:#ffc8dd;}
+.note-orange{background:#ffd3a3;}
+@media (max-width:900px){
+    .sticky-wrap{
+        grid-template-columns: repeat(3,1fr);
+    }
+}
+@media (max-width:520px){
+    .sticky-wrap{
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="top-banner"></div>
+        <div class="nav-bar">
+            <a href="#" data-target="home-section">首页</a>
+            <a href="#" data-target="note-section">笔记</a>
+            <a href="#" data-target="album-section">相册</a>
+            <a href="#" data-target="website-section">网站</a>
+            <a href="#" data-target="about-section">关于</a>
+            <div class="nav-ctrl-group">
+                <button class="btn-export" id="exportBtn">导出JSON</button>
+                <button class="btn-import" id="importBtn">导入JSON</button>
+                <input type="file" id="fileInput" accept=".json"/>
+            </div>
+        </div>
+        <div class="container">
+            <!-- 首页：便利贴区域，contenteditable可直接编辑 -->
+            <div class="home-section active">
+                <div class="sticky-wrap">
+                    <div class="sticky-note note-yellow" contenteditable="true" data-index="0">便利贴1</div>
+                    <div class="sticky-note note-green" contenteditable="true" data-index="1">便利贴2</div>
+                    <div class="sticky-note note-blue" contenteditable="true" data-index="2">便利贴3</div>
+                    <div class="sticky-note note-pink" contenteditable="true" data-index="3">便利贴4</div>
+                    <div class="sticky-note note-orange" contenteditable="true" data-index="4">便利贴5</div>
+                    <div class="sticky-note note-blue" contenteditable="true" data-index="5">便利贴6</div>
+                    <div class="sticky-note note-pink" contenteditable="true" data-index="6">便利贴7</div>
+                    <div class="sticky-note note-orange" contenteditable="true" data-index="7">便利贴8</div>
+                    <div class="sticky-note note-yellow" contenteditable="true" data-index="8">便利贴9</div>
+                    <div class="sticky-note note-green" contenteditable="true" data-index="9">便利贴10</div>
+                </div>
+            </div>
+            <!-- 笔记页：卡片模块，无便利贴 -->
+            <div class="note-section">
+                <div class="content-card add-card" id="addNewCard">
+                    <div class="tip-text">+ 点击新增内容</div>
+                </div>
+                <div id="cardList">
+                </div>
+            </div>
+            <div class="album-section">
+                <div class="waterfall">
+                    <div class="waterfall-item">
+                        <img src="images/001.jpg" alt="">
+                        <div class="img-name">自拍.jpg</div>
+                    </div>
+                    <div class="waterfall-item">
+                        <img src="images/002.jpeg" alt="">
+                        <div class="img-name">步行街.jpeg</div>
+                    </div>
+                    <div class="waterfall-item">
+                        <img src="images/003.jpeg" alt="">
+                        <div class="img-name">办公室.jpeg</div>
+                    </div>
+                    <div class="waterfall-item">
+                        <img src="https://picsum.photos/id/13/600/900" alt="">
+                        <div class="img-name">海边记录.jpg</div>
+                    </div>
+                    <div class="waterfall-item">
+                        <img src="https://picsum.photos/id/14/600/650" alt="">
+                        <div class="img-name">星空特写.jpg</div>
+                    </div>
+                </div>
+            </div>
+            <div class="website-section">
+                <div class="website-btn-wrap">
+                    <a href="https://www.baidu.com" target="_blank">百度</a>
+                    <a href="https://bilibili.com" target="_blank">B站</a>
+                    <a href="https://github.com" target="_blank">Github</a>
+                    <a href="https://youtube.com" target="_blank">Youtube</a>
+                    <a href="https://ming000-bot.github.io/mymuic/" target="_blank">音乐</a>
+                    <a href="https://ming000-bot.github.io/goodweb/" target="_blank">m3u8播放下载</a>
+                    <a href="https://douban.com" target="_blank">豆瓣</a>
+                    <a href="https://csdn.net" target="_blank">CSDN</a>
+                    <a href="https://segmentfault.com" target="_blank">思否</a>
+                    <a href="https://www.51cto.com" target="_blank">51CTO</a>
+                </div>
+            </div>
+            <div class="about-section">
+                <div class="about-card">
+                    <h2>关于我</h2>
+                    <div class="about-item"><span>邮箱：</span>850320932@qq.com</div>
+                    <div class="about-item"><span>联系：</span>有事别找我</div>
+                    <div class="about-item"><span>简介：</span>技术爱好者，记录学习与实践。</div>
+                    <div class="about-item"><span>站点说明：</span>个人学习博客，用于存放笔记、相册。</div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <p>© 2026 个人主页 | 备案号：<span>闽668899</span></p>
+        </footer>
+    </div>
+    <div class="modal-wrap" id="editorModal">
+        <div class="modal-box">
+            <h3>新建内容卡片</h3>
+            <div class="modal-item">
+                <label>标题</label>
+                <input type="text" id="inputTitle" placeholder="输入标题">
+            </div>
+            <div class="modal-item">
+                <label>正文内容</label>
+                <textarea id="inputContent" placeholder="在这里写内容..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-close" id="closeModal">取消</button>
+                <button class="btn-submit" id="submitCard">提交保存</button>
+            </div>
+        </div>
+    </div>
+<script>
+    function initVisit(id) {
+        const key = "visit_" + id;
+        let num = localStorage.getItem(key);
+        if (!num) {
+            num = Math.floor(Math.random() * 800) + 500;
+        }
+        num = parseInt(num) + 1;
+        localStorage.setItem(key, num);
+        document.getElementById(id).innerText = num;
+    }
+
+    // 便利贴数据相关
+    const stickyElements = document.querySelectorAll('.sticky-note');
+    // 加载便利贴
+    function loadStickyNotes(){
+        const savedSticky = JSON.parse(localStorage.getItem("savedSticky") || "[]");
+        stickyElements.forEach((el, idx)=>{
+            if(savedSticky[idx] !== undefined){
+                el.innerText = savedSticky[idx];
+            }
+        })
+    }
+    // 保存便利贴
+    function saveStickyNotes(){
+        let arr = [];
+        stickyElements.forEach(el=>{
+            arr.push(el.innerText.trim());
+        })
+        localStorage.setItem("savedSticky", JSON.stringify(arr));
+    }
+    // 监听便利贴编辑，失去焦点自动保存
+    stickyElements.forEach(el=>{
+        el.addEventListener('blur', saveStickyNotes);
+    })
+
+    const modal = document.getElementById('editorModal');
+    const addCardBtn = document.getElementById('addNewCard');
+    const closeModalBtn = document.getElementById('closeModal');
+    const submitBtn = document.getElementById('submitCard');
+    const titleInput = document.getElementById('inputTitle');
+    const contentInput = document.getElementById('inputContent');
+    const cardList = document.getElementById('cardList');
+    addCardBtn.onclick = ()=>{
+        modal.style.display = "flex";
+        titleInput.value = "";
+        contentInput.value = "";
+    }
+    closeModalBtn.onclick = ()=>{
+        modal.style.display = "none";
+    }
+    submitBtn.onclick = ()=>{
+        const title = titleInput.value.trim();
+        const content = contentInput.value.trim();
+        if(!title || !content){
+            alert("标题和内容不能为空");
+            return;
+        }
+        const now = new Date().toLocaleString();
+        const visitId = "visit_" + Date.now();
+        const newCardHtml = `
+            <div class="content-card">
+                <div class="visit-count">访问量：<span id="${visitId}">0</span></div>
+                <div class="card-body">
+                    <h3>${title}</h3>
+                    <div class="upload-time">${now}</div>
+                    <p>${content}</p>
+                </div>
+            </div>
+        `;
+        cardList.insertAdjacentHTML('afterbegin', newCardHtml);
+        localStorage.setItem("visit_"+visitId, 1);
+        document.getElementById(visitId).innerText = 1;
+        let savedCards = JSON.parse(localStorage.getItem("savedCards") || "[]");
+        savedCards.unshift({title, content, time:now, vid:visitId});
+        localStorage.setItem("savedCards", JSON.stringify(savedCards));
+        modal.style.display = "none";
+    }
+    function loadSavedCards(){
+        const savedCards = JSON.parse(localStorage.getItem("savedCards") || "[]");
+        savedCards.forEach(item=>{
+            const newCardHtml = `
+                <div class="content-card">
+                    <div class="visit-count">访问量：<span id="${item.vid}">0</span></div>
+                    <div class="card-body">
+                        <h3>${item.title}</h3>
+                        <div class="upload-time">${item.time}</div>
+                        <p>${item.content}</p>
+                    </div>
+                </div>
+            `;
+            cardList.insertAdjacentHTML('afterbegin', newCardHtml);
+            let num = localStorage.getItem("visit_"+item.vid) || 0;
+            document.getElementById(item.vid).innerText = num;
+        })
+    }
+    // 导出：同时导出笔记卡片 + 便利贴
+    const exportBtn = document.getElementById("exportBtn");
+    exportBtn.onclick = ()=>{
+        const savedCards = JSON.parse(localStorage.getItem("savedCards") || "[]");
+        const savedSticky = JSON.parse(localStorage.getItem("savedSticky") || "[]");
+        const exportData = {
+            cards: savedCards,
+            stickies: savedSticky
+        };
+        const jsonStr = JSON.stringify(exportData,null,2);
+        const blob = new Blob([jsonStr],{type:"application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "data.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert("导出成功！已包含笔记卡片+便利贴数据");
+    }
+    // 导入：同时读取笔记卡片 + 便利贴
+    const importBtn = document.getElementById("importBtn");
+    const fileInput = document.getElementById("fileInput");
+    importBtn.onclick = ()=> fileInput.click();
+    fileInput.onchange = (e)=>{
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev){
+            try{
+                const data = JSON.parse(ev.target.result);
+                // 兼容旧版本json（只有cards没有stickies）
+                if(Array.isArray(data)){
+                    localStorage.setItem("savedCards",JSON.stringify(data));
+                }else{
+                    localStorage.setItem("savedCards",JSON.stringify(data.cards || []));
+                    localStorage.setItem("savedSticky",JSON.stringify(data.stickies || []));
+                }
+                cardList.innerHTML = "";
+                loadSavedCards();
+                loadStickyNotes();
+                alert("导入成功！笔记卡片+便利贴已加载");
+            }catch(err){
+                alert("文件解析失败，不是合法json文件");
+            }
+        }
+        reader.readAsText(file);
+        fileInput.value = "";
+    }
+
+    const navLinks = document.querySelectorAll('.nav-bar a');
+    const homeArea = document.querySelector('.home-section');
+    const noteArea = document.querySelector('.note-section');
+    const albumArea = document.querySelector('.album-section');
+    const websiteArea = document.querySelector('.website-section');
+    const aboutArea = document.querySelector('.about-section');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e){
+            e.preventDefault();
+            const target = this.dataset.target;
+            homeArea.classList.remove("active");
+            noteArea.classList.remove("active");
+            albumArea.classList.remove("active");
+            websiteArea.classList.remove("active");
+            aboutArea.classList.remove("active");
+            if(target === "home-section"){
+                homeArea.classList.add("active");
+            }else if(target === "note-section"){
+                noteArea.classList.add("active");
+            }else if(target === "album-section"){
+                albumArea.classList.add("active");
+            }else if(target === "website-section"){
+                websiteArea.classList.add("active");
+            }else if(target === "about-section"){
+                aboutArea.classList.add("active");
+            }
+        })
+    })
+//悬浮框关闭逻辑
+document.addEventListener('DOMContentLoaded', function(){
+    const floatBox = document.getElementById("floatBox");
+    const closeBtn = document.getElementById("closeBtn");
+    if(closeBtn){
+        closeBtn.onclick = function(e){
+            e.stopPropagation();
+            floatBox.style.display="none";
+        }
+    }
+    //页面初始化加载便利贴
+    loadStickyNotes();
+    loadSavedCards();
+})
+</script>
+<!-- 左侧悬浮广告卡片 -->
+<div class="left-float-card" id="floatBox">
+    <span class="float-close" id="closeBtn">×</span>
+    <a href="https://ming000-bot.github.io/mymuic/" target="_blank">
+        <img src="images/001.jpg" alt="我">
+    </a>
+</div>
+</body>
+</html>
