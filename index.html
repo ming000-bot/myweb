@@ -487,8 +487,11 @@ const DataStore = {
 function initGlobalVisit() {
     const key = "global_site_visit";
     let num = localStorage.getItem(key);
+ // ========= 在这里自定义初始访问量 =========
+    const startCount = 126805;
+    // ==========================================
     if (!num) {
-        num = Math.floor(Math.random() * 800) + 500;
+        num = startCount;
     }
     num = parseInt(num) + 1;
     localStorage.setItem(key, num);
